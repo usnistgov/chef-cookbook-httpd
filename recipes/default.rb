@@ -7,19 +7,40 @@
 # All rights reserved - Do Not Redistribute
 #
 
-package node[:packages][:webserver] do
-	action :install
+node[:packages].each do |name, pkg|
+	package node[:packages][name] do
+		action :install
+	end
 end
 
-template "/var/www/index.html" do
-	source "index.erb"
-	owner "root"
-	group "root"
-	mode "0644"
-	notifies :restart, "service[apache2]"
+package "acl" do
+	action :install
 end
 
 service node[:packages][:webserver] do
 	supports :status => true, :restart => true, :reload => true
 	action [ :enable, :start ]
+end
+
+directory "/var/www/html" do
+	owner node['svcusers']['webserver']
+	group node['svcgrp']['webserver']
+	mode "0755"
+	action :create
+end
+
+node['web']['admins'].each do |userid|
+	execute "acl" do
+		command "setfacl -m \"user:#{userid}:rwx\",\"d:u:#{userid}:rwx\" /var/www/html"
+		action :run
+		ignore_failure true
+	end
+end
+
+template "/var/www/html/index.html" do
+	source "index.erb"
+	owner node['svcusers']['webserver']
+	group node['svcgrp']['webserver']
+	mode "0644"
+	notifies :restart, "service[#{node[:packages][:webserver]}]"
 end
