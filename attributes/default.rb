@@ -18,3 +18,6 @@ else
 	default['svcusers']['webserver'] = "nobody"
 	default['svcgrp']['webserver'] = "nobody"
 end
+
+default['web']['admins'] = "nobody"
+default['web']['group'] = "nobody"
