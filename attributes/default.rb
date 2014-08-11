@@ -7,7 +7,7 @@ when "redhat", "centos", "fedora"
   default['packages']['php'] = "php"
 end
 
-case node["platform"]
+case node["platform_family"]
 when "debian"
 	default['svcusers']['webserver'] = "www-data"
 	default['svcgrp']['webserver'] = "www-data"
