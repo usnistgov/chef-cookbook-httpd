@@ -44,3 +44,11 @@ template "/var/www/html/index.html" do
 	mode "0644"
 	notifies :restart, "service[#{node[:packages][:webserver]}]"
 end
+
+template "/etc/apache2/sites-available/default" do
+	source "default.erb"
+	owner node['svcusers']['webserver']
+	group node['svcgrp']['webserver']
+	mode "0644"
+	notifies :restart, "service[#{node[:packages][:webserver]}]"
+end

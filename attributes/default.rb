@@ -1,22 +1,20 @@
 case node["platform_family"]
-when "debian", "ubuntu"
-  default['packages']['webserver'] = "apache2"
-  default['packages']['php'] = "php5"
-when "redhat", "centos", "fedora"
-  default['packages']['webserver'] = "httpd"
-  default['packages']['php'] = "php"
-end
-
-case node["platform_family"]
 when "debian"
+	default['packages']['webserver'] = "apache2"
+	default['packages']['php'] = "php5"
 	default['svcusers']['webserver'] = "www-data"
 	default['svcgrp']['webserver'] = "www-data"
-when "rhel"
+	default['web']['docroot'] = "/var/www/html"
+when "rhel", "fedora"
+	default['packages']['webserver'] = "httpd"
+	default['packages']['php'] = "php"
 	default['svcusers']['webserver'] = "apache"
 	default['svcugrp']['webserver'] = "apache"
+	default['web']['docroot'] = "/var/www/html"
 else
 	default['svcusers']['webserver'] = "nobody"
 	default['svcgrp']['webserver'] = "nobody"
+	default['web']['docroot'] = "/var/www/html"
 end
 
 default['web']['admins'] = "nobody"
