@@ -45,8 +45,8 @@ template "/var/www/html/index.html" do
 	notifies :restart, "service[#{node[:packages][:webserver]}]"
 end
 
-template "/etc/apache2/sites-available/default" do
-	source "default.erb"
+template "/etc/apache2/sites-available/000-default.conf" do
+	source "000-default.conf.erb"
 	owner node['svcusers']['webserver']
 	group node['svcgrp']['webserver']
 	mode "0644"

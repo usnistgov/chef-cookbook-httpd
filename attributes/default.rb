@@ -18,5 +18,5 @@ else
 	default['web']['docroot'] = "/var/www/html"
 end
 
-default['web']['admins'] = "nobody"
-default['web']['group'] = "nobody"
+default['web']['admins'] = "chef"
+default['web']['group'] = "chef"

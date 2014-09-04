@@ -1,7 +1,0 @@
-<Location /awstats>
-	Order deny,allow
-	#Deny from all
-	Allow from All # IP address you allow
-</Location>
-
-ScriptAlias /awstats/ /usr/lib/cgi-bin/
