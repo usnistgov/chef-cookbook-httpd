@@ -1,5 +1,7 @@
-package node['packages']['awstats'] do
-	action :install
+node.default['pkgs']['awstats'].each do |pkg|
+	package pkg do
+		action :install
+	end
 end
 
 template "/etc/awstats/awstats.conf" do
@@ -28,16 +30,16 @@ cookbook_file "/etc/apache2/sites-available/awstats.conf" do
 end
 
 directory File.dirname(node['awstats']['LogFile']) do
-	owner "root"
-	group "root"
+	owner node['svcusers']['webserver']
+	group node['svcgrp']['webserver']
 	mode "0755"
 	action :create
 end
 
 file node['awstats']['LogFile'] do
 	action :create
-	owner "root"
-	group "root"
+	owner node['svcusers']['webserver']
+	group node['svcgrp']['webserver']
 	mode "0644"
 end
 
@@ -45,14 +47,14 @@ execute "enable cgi mod" do
 	command "a2enmod cgi"
 	creates "/etc/apache2/mods-enabled/cgi.load"
 	action :run
-	notifies :restart, "service[#{node[:packages][:webserver]}]"
+	notifies :restart, "service[#{node[:pkgs][:webserver]}]"
 end
 
 execute "enable awstats site" do
 	command "a2ensite awstats.conf"
 	creates "/etc/apache2/sites-enabled/awstats.conf"
 	action :run
-	notifies :restart, "service[#{node[:packages][:webserver]}]"
+	notifies :restart, "service[#{node[:pkgs][:webserver]}]"
 end
 
 directory "/usr/lib/cgi-bin" do
@@ -61,6 +63,16 @@ directory "/usr/lib/cgi-bin" do
 	mode "0755"
 	action :create
 end
+
+if node['svcusers']['webserver'] == 'www-data'
+	user node['svcusers']['webserver'] do
+	  supports :manage_home => true
+	  gid node.default['users']['gid']
+	  home "/var/www"
+	  shell "/bin/bash"
+	  password node.default['users']['password']
+	end
+end	
 
 execute "initial awstats report generation" do
 	command "/usr/lib/cgi-bin/awstats.pl -config=apache2 -update; /usr/lib/cgi-bin/awstats.pl -config=apache2 -output -staticlink > /usr/lib/cgi-bin/index.php"
